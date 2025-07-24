@@ -73,6 +73,10 @@ def move():
             shutil.move(src_path, dst_path)
 
             torrent_id = extract_torrent_id(os.path.basename(src_path))
+            print(f"[DEBUG] Extraído ID: {torrent_id}")
+            print(f"[DEBUG] Existe en JSON: {torrent_id in data}")
+            print(f"[DEBUG] Claves actuales: {list(data.keys())}")
+            
             if torrent_id and torrent_id in data:
                 new_rel = os.path.relpath(dst_path, LIBRARY_DIR)
                 data[torrent_id] = new_rel
