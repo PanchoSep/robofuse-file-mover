@@ -28,18 +28,12 @@ def index():
     folder_map = {}
 
     for root, dirs, files in os.walk(LIBRARY_DIR):
-        for d in dirs:
-            full_path = os.path.join(root, d)
-            strms = [
-                f for f in os.listdir(full_path)
-                if f.endswith(".strm")
-            ]
-            if strms:
-                rel_folder = os.path.relpath(full_path, LIBRARY_DIR)
-                folders.append(rel_folder)
-                folder_map[rel_folder] = strms
+        rel_root = os.path.relpath(root, LIBRARY_DIR)
+        strms = [f for f in files if f.endswith('.strm')]
 
-        break  # solo nivel raíz
+        if strms:
+            folders.append(rel_root)
+            folder_map[rel_root] = strms
 
     return render_template("index.html", folders=folders, folder_map=folder_map)
 
