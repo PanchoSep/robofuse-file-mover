@@ -29,11 +29,12 @@
 
     <h3>Carpetas con .strm:</h3>
     <ul>
-      {% for folder in strm_folders %}
+      {% for item in strm_folders %}
         <li>
           <label>
-            <input type="checkbox" name="selected" value="{{ folder }}">
-            <span class="path">{{ folder }}</span>
+            <input type="checkbox" name="selected" value="{{ item.folder }}">
+            <span class="path">{{ item.folder }}</span><br>
+            <small>↳ {{ item.file_name }}</small>
           </label>
         </li>
       {% endfor %}
