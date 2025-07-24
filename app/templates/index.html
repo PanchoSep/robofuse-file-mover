@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>STRM Manager</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    form.inline { display: inline; margin-left: 1em; }
+    .folder { margin-bottom: 1.5em; }
+  </style>
+</head>
+<body>
+  <h2>Administrador de archivos .strm</h2>
+  <form method="POST" action="/move">
+    <label>Mover seleccionados a:</label>
+    <select name="destination" required>
+      {% for f in folders %}
+        <option value="{{ f }}">{{ f }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Mover seleccionados</button>
+
+    <button type="submit" formaction="/delete" formmethod="post">Eliminar seleccionados</button>
+
+    <hr>
+
+    {% for folder, files in folder_map.items() %}
+      <div class="folder">
+        <h3>{{ folder }}</h3>
+        <ul>
+          {% for file in files %}
+            <li>
+              <input type="checkbox" name="selected" value="{{ folder }}||{{ file }}">
+              {{ file }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </form>
+</body>
+</html>
