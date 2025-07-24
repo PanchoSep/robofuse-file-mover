@@ -5,6 +5,7 @@ import json
 import re
 
 app = Flask(__name__)
+app.debug = True
 LIBRARY_DIR = "Library"
 PROCESSED_PATHS_FILE = "Library/processed_paths.json"
 
