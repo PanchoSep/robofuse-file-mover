@@ -30,15 +30,22 @@ def extract_torrent_id(folder_name):
     return match.group(1) if match else None
 
 def get_strm_folders():
-    """Retorna una lista de carpetas que contienen al menos un archivo .strm"""
+    """Devuelve una lista de dicts: cada uno con folder + nombre de archivo dentro del .strm"""
     strm_folders = []
 
     for root, dirs, files in os.walk(LIBRARY_DIR):
-        if any(f.endswith('.strm') for f in files):
+        strm_files = [f for f in files if f.endswith('.strm')]
+        if strm_files:
             rel_path = os.path.relpath(root, LIBRARY_DIR)
-            strm_folders.append(rel_path)
+            first_strm = os.path.join(root, strm_files[0])
+            filename_inside = extract_strm_filename(first_strm)
 
-    return sorted(strm_folders)
+            strm_folders.append({
+                "folder": rel_path,
+                "file_name": filename_inside or "¿vacío?"
+            })
+
+    return sorted(strm_folders, key=lambda x: x["folder"])
 
 def get_possible_destinations(strm_folders):
     """Devuelve un set con los niveles superiores disponibles para mover"""
@@ -51,7 +58,17 @@ def get_possible_destinations(strm_folders):
             destinations.add(prefix)
 
     return sorted(destinations)
-
+    
+def extract_strm_filename(strm_path):
+    if not os.path.exists(strm_path):
+        return None
+    try:
+        with open(strm_path, "r") as f:
+            url = f.read().strip()
+            return os.path.basename(url)
+    except Exception as e:
+        return f"⚠️ Error leyendo .strm: {e}"
+        
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
