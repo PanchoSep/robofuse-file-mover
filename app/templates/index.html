@@ -5,38 +5,39 @@
   <title>STRM Manager</title>
   <style>
     body { font-family: sans-serif; margin: 2em; }
-    form.inline { display: inline; margin-left: 1em; }
-    .folder { margin-bottom: 1.5em; }
+    h2, h3 { margin-bottom: 0.3em; }
+    ul { list-style: none; padding-left: 1em; }
+    li { margin-bottom: 0.3em; }
+    .path { font-family: monospace; }
   </style>
 </head>
 <body>
-  <h2>Administrador de archivos .strm</h2>
+  <h2>Administrador de carpetas de películas (.strm)</h2>
+
   <form method="POST" action="/move">
-    <label>Mover seleccionados a:</label>
+    <label><strong>Mover carpetas seleccionadas a:</strong></label>
     <select name="destination" required>
-      {% for f in folders %}
-        <option value="{{ f }}">{{ f }}</option>
+      {% for dest in destination_folders %}
+        <option value="{{ dest }}">{{ dest }}</option>
       {% endfor %}
     </select>
-    <button type="submit">Mover seleccionados</button>
+    <button type="submit">Mover</button>
 
-    <button type="submit" formaction="/delete" formmethod="post">Eliminar seleccionados</button>
+    <button type="submit" formaction="/delete" formmethod="post" onclick="return confirm('¿Estás seguro de eliminar estas carpetas?')">Eliminar</button>
 
     <hr>
 
-    {% for folder, files in folder_map.items() %}
-      <div class="folder">
-        <h3>{{ folder }}</h3>
-        <ul>
-          {% for file in files %}
-            <li>
-              <input type="checkbox" name="selected" value="{{ folder }}||{{ file }}">
-              {{ file }}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endfor %}
+    <h3>Carpetas con .strm:</h3>
+    <ul>
+      {% for folder in strm_folders %}
+        <li>
+          <label>
+            <input type="checkbox" name="selected" value="{{ folder }}">
+            <span class="path">{{ folder }}</span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
   </form>
 </body>
 </html>
