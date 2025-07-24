@@ -65,16 +65,18 @@ def move():
 
     for rel_path in selected:
         src_path = os.path.join(LIBRARY_DIR, rel_path)
-        folder_name = os.path.basename(rel_path)
-        dst_path = os.path.join(LIBRARY_DIR, destination, folder_name)
+        dst_root = os.path.join(LIBRARY_DIR, destination)
+        dst_path = os.path.join(dst_root, os.path.basename(src_path))  # evita duplicación
 
         if os.path.exists(src_path):
+            os.makedirs(dst_root, exist_ok=True)
             shutil.move(src_path, dst_path)
 
-            torrent_id = extract_torrent_id(folder_name)
+            torrent_id = extract_torrent_id(os.path.basename(src_path))
             if torrent_id and torrent_id in data:
                 new_rel = os.path.relpath(dst_path, LIBRARY_DIR)
                 data[torrent_id] = new_rel
+                print(f"✔️ Actualizado {torrent_id} → {new_rel}")
 
     save_processed_paths(data)
     return redirect('/')
