@@ -7,6 +7,6 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./robofuse/Library:/app/Library
-      - ./robofuse/processed_paths.json:/app/processed_paths.json
+      - ../robofuse/Library:/app/Library
+      - ../robofuse/processed_paths.json:/app/processed_paths.json
     restart: unless-stopped
