@@ -25,7 +25,8 @@ def save_processed_paths(data):
         json.dump(data, f, indent=2)
 
 def extract_torrent_id(folder_name):
-    match = re.search(r"\[([A-Z0-9]{12})\]", folder_name)
+    print(f"[DEBUG] Intentando extraer ID desde: {folder_name}")
+    match = re.search(r"\[([a-zA-Z0-9]{6,20})\]", folder_name)
     return match.group(1) if match else None
 
 def get_strm_folders():
