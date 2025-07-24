@@ -3,6 +3,11 @@ import os
 import shutil
 import json
 import re
+import sys
+
+os.makedirs("/app/logs", exist_ok=True)
+sys.stdout = open("/app/logs/strm.log", "a", buffering=1)
+sys.stderr = sys.stdout
 
 app = Flask(__name__)
 app.debug = True
@@ -104,6 +109,19 @@ def delete():
 
     save_processed_paths(data)
     return redirect('/')
+    
+@app.route('/logs')
+def logs():
+    log_file = "/app/logs/strm.log"
+    if not os.path.exists(log_file):
+        return "Log vacío o no creado aún."
+
+    with open(log_file, "r") as f:
+        lines = f.readlines()
+
+    # Solo mostrar las últimas 100 líneas
+    last_lines = lines[-100:] if len(lines) > 100 else lines
+    return "<pre>" + "".join(last_lines) + "</pre>"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
