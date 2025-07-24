@@ -22,20 +22,39 @@ def extract_torrent_id(folder_name):
     match = re.search(r"\[([A-Z0-9]{12})\]", folder_name)
     return match.group(1) if match else None
 
-@app.route('/')
-def index():
-    folders = []
-    folder_map = {}
+def get_strm_folders():
+    """Retorna una lista de carpetas que contienen al menos un archivo .strm"""
+    strm_folders = []
 
     for root, dirs, files in os.walk(LIBRARY_DIR):
-        rel_root = os.path.relpath(root, LIBRARY_DIR)
-        strms = [f for f in files if f.endswith('.strm')]
+        if any(f.endswith('.strm') for f in files):
+            rel_path = os.path.relpath(root, LIBRARY_DIR)
+            strm_folders.append(rel_path)
 
-        if strms:
-            folders.append(rel_root)
-            folder_map[rel_root] = strms
+    return sorted(strm_folders)
 
-    return render_template("index.html", folders=folders, folder_map=folder_map)
+def get_possible_destinations(strm_folders):
+    """Devuelve un set con los niveles superiores disponibles para mover"""
+    destinations = set()
+
+    for folder in strm_folders:
+        parts = folder.split(os.sep)
+        for i in range(1, len(parts)):
+            prefix = os.path.join(*parts[:i])
+            destinations.add(prefix)
+
+    return sorted(destinations)
+
+@app.route('/')
+def index():
+    strm_folders = get_strm_folders()
+    destination_folders = get_possible_destinations(strm_folders)
+
+    return render_template(
+        "index.html",
+        strm_folders=strm_folders,
+        destination_folders=destination_folders
+    )
 
 @app.route('/move', methods=['POST'])
 def move():
@@ -44,27 +63,18 @@ def move():
 
     data = load_processed_paths()
 
-    for entry in selected:
-        folder, filename = entry.split("||")
-        src_folder = os.path.join(LIBRARY_DIR, folder)
-        dst_folder = os.path.join(LIBRARY_DIR, destination)
-
-        os.makedirs(dst_folder, exist_ok=True)
-
-        src_path = os.path.join(src_folder, filename)
-        dst_path = os.path.join(dst_folder, filename)
+    for rel_path in selected:
+        src_path = os.path.join(LIBRARY_DIR, rel_path)
+        folder_name = os.path.basename(rel_path)
+        dst_path = os.path.join(LIBRARY_DIR, destination, folder_name)
 
         if os.path.exists(src_path):
             shutil.move(src_path, dst_path)
 
-            # actualizar JSON
-            torrent_id = extract_torrent_id(folder)
+            torrent_id = extract_torrent_id(folder_name)
             if torrent_id and torrent_id in data:
-                new_rel_path = os.path.relpath(
-                    os.path.join(destination, folder.split("/")[-1]),
-                    start=LIBRARY_DIR
-                )
-                data[torrent_id] = new_rel_path
+                new_rel = os.path.relpath(dst_path, LIBRARY_DIR)
+                data[torrent_id] = new_rel
 
     save_processed_paths(data)
     return redirect('/')
@@ -74,26 +84,19 @@ def delete():
     selected = request.form.getlist("selected")
     data = load_processed_paths()
 
-    for entry in selected:
-        folder, filename = entry.split("||")
-        file_path = os.path.join(LIBRARY_DIR, folder, filename)
+    for rel_path in selected:
+        full_path = os.path.join(LIBRARY_DIR, rel_path)
+        folder_name = os.path.basename(rel_path)
 
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        if os.path.exists(full_path):
+            shutil.rmtree(full_path)
 
-            # Si ya no hay más .strm en la carpeta, eliminar del JSON
-            full_folder_path = os.path.join(LIBRARY_DIR, folder)
-            remaining = [
-                f for f in os.listdir(full_folder_path)
-                if f.endswith(".strm")
-            ]
-            if not remaining:
-                torrent_id = extract_torrent_id(folder)
-                if torrent_id and torrent_id in data:
-                    del data[torrent_id]
+            torrent_id = extract_torrent_id(folder_name)
+            if torrent_id and torrent_id in data:
+                del data[torrent_id]
 
     save_processed_paths(data)
     return redirect('/')
-    
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
