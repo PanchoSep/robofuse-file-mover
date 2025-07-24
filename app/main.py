@@ -6,7 +6,7 @@ import re
 
 app = Flask(__name__)
 LIBRARY_DIR = "Library"
-PROCESSED_PATHS_FILE = "processed_paths.json"
+PROCESSED_PATHS_FILE = "Library/processed_paths.json"
 
 def load_processed_paths():
     if os.path.exists(PROCESSED_PATHS_FILE):
