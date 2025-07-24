@@ -72,7 +72,7 @@ def extract_strm_filename(strm_path):
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
-    destination_folders = get_possible_destinations(strm_folders)
+    destination_folders = get_possible_destinations([f["folder"] for f in strm_folders])
 
     return render_template(
         "index.html",
