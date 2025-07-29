@@ -61,7 +61,7 @@ def get_possible_destinations(strm_folders):
 
     for folder in strm_folders:
         parts = folder.split(os.sep)
-        for i in range(1, len(parts)):
+        for i in range(1, len(parts) + 1):
             prefix = os.path.join(*parts[:i])
             destinations.add(prefix)
 
