@@ -15,11 +15,10 @@
   <h2>Administrador de carpetas de películas (.strm)</h2>
 
   
-  {% macro render_tree(tree, parent_path='') %}
+  {% macro render_tree(tree) %}
   <ul>
     {% for name, value in tree.items() %}
-      {% set full_path = parent_path + '/' + name if parent_path else name %}
-      {% if '__leaf__' in value %}
+      {% if value.get('__leaf__') %}
         {% set node = value['__leaf__'] %}
         <li>
           <label>
@@ -32,7 +31,7 @@
         <li>
           <details>
             <summary>{{ name }}</summary>
-            {{ render_tree(value, full_path) }}
+            {{ render_tree(value) }}
           </details>
         </li>
       {% endif %}
