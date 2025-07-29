@@ -104,7 +104,6 @@ def nest_strm_folders(strm_folders):
 
         for i, part in enumerate(parts):
             if i == len(parts) - 1:
-                # Último nivel (es carpeta con .strm o .library)
                 current[part] = {"__leaf__": item}
             else:
                 current = current.setdefault(part, {})
@@ -112,7 +111,7 @@ def nest_strm_folders(strm_folders):
     return tree
 
 
-        
+  
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
