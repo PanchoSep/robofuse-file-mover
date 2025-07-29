@@ -62,5 +62,6 @@
     <h3>Carpetas con .strm:</h3>
     {{ render_tree(nested_folders) }}
   </form>
+  <pre>{{ nested_folders|tojson(indent=2) }}</pre>
 </body>
 </html>
