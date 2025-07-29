@@ -30,15 +30,22 @@ def extract_torrent_id(folder_name):
     return match.group(1) if match else None
 
 def get_strm_folders():
-    """Devuelve una lista de dicts: cada uno con folder + nombre de archivo dentro del .strm"""
+    """Devuelve una lista de dicts: cada uno con folder + nombre de archivo dentro del .strm o .library"""
     strm_folders = []
 
     for root, dirs, files in os.walk(LIBRARY_DIR):
-        strm_files = [f for f in files if f.endswith('.strm')]
-        if strm_files:
+        # Considerar carpetas con al menos un .strm o .library
+        relevant_files = [f for f in files if f.endswith('.strm') or f.endswith('.library')]
+        if relevant_files:
             rel_path = os.path.relpath(root, LIBRARY_DIR)
-            first_strm = os.path.join(root, strm_files[0])
-            filename_inside = extract_strm_filename(first_strm)
+
+            # Buscar primero .strm, si no hay, usar .library
+            first_strm = next((f for f in relevant_files if f.endswith('.strm')), None)
+            if first_strm:
+                full_path = os.path.join(root, first_strm)
+                filename_inside = extract_strm_filename(full_path)
+            else:
+                filename_inside = "(.library detectado)"
 
             strm_folders.append({
                 "folder": rel_path,
