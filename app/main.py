@@ -60,12 +60,12 @@ def get_possible_destinations(strm_folders):
     destinations = set()
 
     for folder in strm_folders:
-        # Elimina el último segmento (ej: 'Movies/1080p/Nombre [ID]' → 'Movies/1080p')
-        parent_folder = os.path.dirname(folder)
-        parts = parent_folder.split(os.sep)
+        # Agrega la carpeta misma como posible destino
+        destinations.add(folder)
 
-        # Agrega todos los niveles intermedios: 'Movies', 'Movies/1080p', etc.
-        for i in range(1, len(parts) + 1):
+        # También sus niveles padres: ej. 'Movies/1080p/Algo' → 'Movies', 'Movies/1080p'
+        parts = folder.split(os.sep)
+        for i in range(1, len(parts)):
             prefix = os.path.join(*parts[:i])
             destinations.add(prefix)
 
