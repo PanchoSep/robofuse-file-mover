@@ -82,6 +82,7 @@ def extract_strm_filename(strm_path):
             return os.path.basename(url)
     except Exception as e:
         return f"⚠️ Error leyendo .strm: {e}"
+
 def group_destinations(destinations):
     grouped = defaultdict(list)
 
@@ -93,18 +94,35 @@ def group_destinations(destinations):
             grouped[parts[0]].append(os.sep.join(parts[1:]))
 
     return dict(grouped)
+
+def nest_strm_folders(strm_folders):
+    """Convierte la lista plana en una estructura jerárquica anidada"""
+    tree = {}
+
+    for item in strm_folders:
+        parts = item["folder"].split(os.sep)
+        current = tree
+
+        for part in parts[:-1]:  # carpetas intermedias
+            current = current.setdefault(part, {})
+
+        current[parts[-1]] = item  # hoja final (la carpeta con .strm o .library)
+
+    return tree
         
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
     destination_folders = get_possible_destinations(strm_folders)
     grouped_destinations = group_destinations(destination_folders)
+    nested_folders = nest_strm_folders(strm_folders)
 
     return render_template(
         "index.html",
         strm_folders=strm_folders,
         destination_folders=destination_folders,
-        grouped_destinations=grouped_destinations
+        grouped_destinations=grouped_destinations,
+        nested_folders=nested_folders
     )
 
 @app.route('/move', methods=['POST'])
