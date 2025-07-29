@@ -31,18 +31,17 @@ def extract_torrent_id(folder_name):
     return match.group(1) if match else None
 
 def get_strm_folders():
-    """Devuelve una lista de dicts: cada uno con folder + nombre de archivo dentro del .strm o .library"""
     strm_folders = []
 
     for root, dirs, files in os.walk(LIBRARY_DIR):
-        # Considerar carpetas con al menos un .strm o .library
-        relevant_files = [f for f in files if f.endswith('.strm') or f.endswith('.library')]
-        if relevant_files:
+        has_strm = any(f.endswith('.strm') for f in files)
+        has_library = any(f.endswith('.library') for f in files)
+
+        if has_strm or has_library:
             rel_path = os.path.relpath(root, LIBRARY_DIR)
 
-            # Buscar primero .strm, si no hay, usar .library
-            first_strm = next((f for f in relevant_files if f.endswith('.strm')), None)
-            if first_strm:
+            if has_strm:
+                first_strm = next((f for f in files if f.endswith('.strm')), None)
                 full_path = os.path.join(root, first_strm)
                 filename_inside = extract_strm_filename(full_path)
             else:
@@ -50,26 +49,29 @@ def get_strm_folders():
 
             strm_folders.append({
                 "folder": rel_path,
-                "file_name": filename_inside or "¿vacío?"
+                "file_name": filename_inside or "¿vacío?",
+                "type": "strm" if has_strm else "library"
             })
 
     return sorted(strm_folders, key=lambda x: x["folder"])
 
 def get_possible_destinations(strm_folders):
-    """Devuelve rutas intermedias (sin incluir carpetas con [ID]) como posibles destinos"""
     destinations = set()
 
-    for folder in strm_folders:
-        # Agrega la carpeta misma como posible destino
+    for folder_data in strm_folders:
+        if folder_data["type"] != "library":
+            continue  # solo queremos carpetas marcadas como destino
+
+        folder = folder_data["folder"]
         destinations.add(folder)
 
-        # También sus niveles padres: ej. 'Movies/1080p/Algo' → 'Movies', 'Movies/1080p'
         parts = folder.split(os.sep)
         for i in range(1, len(parts)):
             prefix = os.path.join(*parts[:i])
             destinations.add(prefix)
 
     return sorted(destinations)
+
     
 def extract_strm_filename(strm_path):
     if not os.path.exists(strm_path):
