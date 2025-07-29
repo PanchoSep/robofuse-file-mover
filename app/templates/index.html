@@ -19,7 +19,6 @@
   <ul>
     {% for name, value in tree.items() %}
       {% set full_path = parent_path + '/' + name if parent_path else name %}
-  
       {% if value.get('__leaf__') %}
         {% set node = value['__leaf__'] %}
         <li>
@@ -40,6 +39,7 @@
     {% endfor %}
   </ul>
   {% endmacro %}
+
 
 
   
