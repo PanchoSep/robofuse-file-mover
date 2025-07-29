@@ -96,7 +96,6 @@ def group_destinations(destinations):
     return dict(grouped)
 
 def nest_strm_folders(strm_folders):
-    """Convierte la lista plana en una estructura jerárquica anidada"""
     tree = {}
 
     for item in strm_folders:
@@ -106,9 +105,15 @@ def nest_strm_folders(strm_folders):
         for part in parts[:-1]:  # carpetas intermedias
             current = current.setdefault(part, {})
 
-        current[parts[-1]] = item  # hoja final (la carpeta con .strm o .library)
+        # Si ya hay un dict (subcarpetas), no lo sobrescribimos
+        leaf_name = parts[-1]
+        if isinstance(current.get(leaf_name), dict):
+            current[leaf_name]["__item__"] = item
+        else:
+            current[leaf_name] = item
 
     return tree
+
         
 @app.route('/')
 def index():
