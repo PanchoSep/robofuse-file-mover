@@ -1,18 +1,20 @@
 {% macro render_tree(tree) %}
 <ul>
-  {% for name, value in tree|dictsort %}
-    {% if value.__leaf__ is defined %}
+  {% for name in tree %}
+    {% set value = tree[name] %}
+    {% if value['__leaf__'] is defined %}
+      {% set node = value['__leaf__'] %}
       <li>
         <label>
-          <input type="checkbox" name="selected" value="{{ value.__leaf__.folder }}">
-          <span class="path">{{ value.__leaf__.folder }}</span><br>
-          <small>↳ {{ value.__leaf__.file_name }}</small>
+          <input type="checkbox" name="selected" value="{{ node.folder }}">
+          <strong>{{ node.folder.split('/')[-1] }}</strong><br>
+          <small>↳ {{ node.file_name }}</small>
         </label>
       </li>
     {% else %}
       <li>
         <details>
-          <summary>{{ name }}</summary>
+          <summary><strong>{{ name }}</strong></summary>
           {{ render_tree(value) }}
         </details>
       </li>
@@ -20,6 +22,7 @@
   {% endfor %}
 </ul>
 {% endmacro %}
+
 
 
 
