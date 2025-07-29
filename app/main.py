@@ -75,16 +75,29 @@ def extract_strm_filename(strm_path):
             return os.path.basename(url)
     except Exception as e:
         return f"⚠️ Error leyendo .strm: {e}"
+def group_destinations(destinations):
+    grouped = defaultdict(list)
+
+    for path in destinations:
+        parts = path.split(os.sep)
+        if len(parts) == 1:
+            grouped[parts[0]]  # clave principal
+        elif len(parts) >= 2:
+            grouped[parts[0]].append(os.sep.join(parts[1:]))
+
+    return dict(grouped)
         
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
     destination_folders = get_possible_destinations([f["folder"] for f in strm_folders])
+    grouped_destinations = group_destinations(destination_folders)
 
     return render_template(
         "index.html",
         strm_folders=strm_folders,
-        destination_folders=destination_folders
+        destination_folders=destination_folders,
+        grouped_destinations=grouped_destinations
     )
 
 @app.route('/move', methods=['POST'])
