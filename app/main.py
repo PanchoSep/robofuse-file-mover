@@ -97,7 +97,7 @@ def group_destinations(destinations):
 @app.route('/')
 def index():
     strm_folders = get_strm_folders()
-    destination_folders = get_possible_destinations([f["folder"] for f in strm_folders])
+    destination_folders = get_possible_destinations(strm_folders)
     grouped_destinations = group_destinations(destination_folders)
 
     return render_template(
