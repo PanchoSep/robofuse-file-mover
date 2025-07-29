@@ -31,17 +31,32 @@
     <hr>
 
     <h3>Carpetas con .strm:</h3>
-    <ul>
-      {% for item in strm_folders %}
-        <li>
-          <label>
-            <input type="checkbox" name="selected" value="{{ item.folder }}">
-            <span class="path">{{ item.folder }}</span><br>
-            <small>↳ {{ item.file_name }}</small>
-          </label>
-        </li>
-      {% endfor %}
-    </ul>
+    {{ render_tree(nested_folders) }}
   </form>
 </body>
 </html>
+
+{% macro render_tree(tree, parent_path='') %}
+<ul>
+  {% for name, value in tree.items() %}
+    {% set full_path = parent_path + '/' + name if parent_path else name %}
+
+    {% if value.get('folder') %}
+      <li>
+        <label>
+          <input type="checkbox" name="selected" value="{{ value.folder }}">
+          <span class="path">{{ value.folder }}</span><br>
+          <small>↳ {{ value.file_name }}</small>
+        </label>
+      </li>
+    {% else %}
+      <li>
+        <details>
+          <summary>{{ name }}</summary>
+          {{ render_tree(value, full_path) }}
+        </details>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% endmacro %}
