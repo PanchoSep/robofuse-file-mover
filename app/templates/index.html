@@ -14,6 +14,34 @@
 <body>
   <h2>Administrador de carpetas de películas (.strm)</h2>
 
+  
+  {% macro render_tree(tree, parent_path='') %}
+  <ul>
+    {% for name, value in tree.items() %}
+      {% set full_path = parent_path + '/' + name if parent_path else name %}
+  
+      {% if value.get('folder') %}
+        <li>
+          <label>
+            <input type="checkbox" name="selected" value="{{ value.folder }}">
+            <span class="path">{{ value.folder }}</span><br>
+            <small>↳ {{ value.file_name }}</small>
+          </label>
+        </li>
+      {% else %}
+        <li>
+          <details>
+            <summary>{{ name }}</summary>
+            {{ render_tree(value, full_path) }}
+          </details>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+  {% endmacro %}
+
+
+  
   <form method="POST" action="/move">
     <label><strong>Mover carpetas seleccionadas a:</strong></label>
     <select name="destination" required>
@@ -35,28 +63,3 @@
   </form>
 </body>
 </html>
-
-{% macro render_tree(tree, parent_path='') %}
-<ul>
-  {% for name, value in tree.items() %}
-    {% set full_path = parent_path + '/' + name if parent_path else name %}
-
-    {% if value.get('folder') %}
-      <li>
-        <label>
-          <input type="checkbox" name="selected" value="{{ value.folder }}">
-          <span class="path">{{ value.folder }}</span><br>
-          <small>↳ {{ value.file_name }}</small>
-        </label>
-      </li>
-    {% else %}
-      <li>
-        <details>
-          <summary>{{ name }}</summary>
-          {{ render_tree(value, full_path) }}
-        </details>
-      </li>
-    {% endif %}
-  {% endfor %}
-</ul>
-{% endmacro %}
