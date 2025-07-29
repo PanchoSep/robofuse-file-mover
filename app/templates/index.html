@@ -5,16 +5,18 @@
     {% if value['__leaf__'] is defined %}
       {% set node = value['__leaf__'] %}
       <li>
-        <label>
+        <label class="movie-item">
           <input type="checkbox" name="selected" value="{{ node.folder }}">
-          <strong>{{ node.folder.split('/')[-1] }}</strong><br>
-          <small>↳ {{ node.file_name }}</small>
+          <div class="movie-text">
+            <strong>{{ node.folder.split('/')[-1] }}</strong>
+            <div class="file-name">↳ {{ node.file_name }}</div>
+          </div>
         </label>
       </li>
     {% else %}
       <li>
         <details>
-          <summary><strong>{{ name }}</strong></summary>
+          <summary><span class="folder-name">{{ name }}</span></summary>
           {{ render_tree(value) }}
         </details>
       </li>
@@ -22,6 +24,7 @@
   {% endfor %}
 </ul>
 {% endmacro %}
+
 
 
 
@@ -39,74 +42,106 @@
         font-family: sans-serif;
         margin: 1em;
         padding: 0;
-        background-color: #f9f9f9;
+        line-height: 1.4;
+        background: #f9f9f9;
       }
-  
+    
       h2, h3 {
-        margin-bottom: 0.5em;
+        margin-bottom: 0.6em;
       }
-  
+    
       form {
-        display: flex;
-        flex-direction: column;
-        gap: 1em;
+        background: white;
+        padding: 1em;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
-  
-      label strong {
-        display: block;
-        margin-bottom: 0.5em;
-      }
-  
-      select, button {
-        font-size: 1em;
-        padding: 0.5em;
-        width: 100%;
-        max-width: 400px;
-      }
-  
+    
       ul {
         list-style: none;
-        padding-left: 1em;
-        margin: 0;
+        padding-left: 0.5em;
       }
-  
+    
       li {
         margin-bottom: 0.5em;
       }
-  
-      .path {
-        font-family: monospace;
-        font-size: 0.9em;
+    
+      .movie-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6em;
+        padding: 0.3em 0;
+      }
+    
+      .movie-text {
+        display: flex;
+        flex-direction: column;
         word-break: break-word;
       }
-  
-      small {
-        display: block;
-        color: #666;
-        font-size: 0.8em;
-        margin-left: 1.2em;
+    
+      .file-name {
+        font-size: 0.85em;
+        color: gray;
       }
-  
-      details > summary {
+    
+      .path {
+        font-family: monospace;
+      }
+    
+      summary {
         cursor: pointer;
         font-weight: bold;
-        padding: 0.2em 0;
+        padding: 0.3em 0;
       }
-  
+    
+      select, button {
+        font-size: 1em;
+        margin-right: 0.5em;
+        margin-top: 0.5em;
+        padding: 0.5em;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+    
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+      }
+    
+      button:hover {
+        background-color: #0056b3;
+      }
+    
       @media (max-width: 600px) {
         body {
+          margin: 0.5em;
+        }
+    
+        form {
+          padding: 0.8em;
+        }
+    
+        .movie-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+    
+        .movie-text strong {
           font-size: 1em;
         }
-  
-        .path {
-          font-size: 0.85em;
+    
+        .file-name {
+          font-size: 0.8em;
         }
-  
-        small {
-          font-size: 0.75em;
+    
+        select, button {
+          width: 100%;
+          margin-bottom: 0.5em;
         }
       }
     </style>
+
   </head>
   <body>
     <h2>Administrador de carpetas de películas (.strm)</h2>
