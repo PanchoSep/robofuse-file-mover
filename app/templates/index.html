@@ -20,12 +20,13 @@
     {% for name, value in tree.items() %}
       {% set full_path = parent_path + '/' + name if parent_path else name %}
   
-      {% if value.get('folder') %}
+      {% if value.get('folder') or value.get('__item__') %}
         <li>
           <label>
-            <input type="checkbox" name="selected" value="{{ value.folder }}">
-            <span class="path">{{ value.folder }}</span><br>
-            <small>↳ {{ value.file_name }}</small>
+            {% set node = value.get('__item__', value) %}
+            <input type="checkbox" name="selected" value="{{ node.folder }}">
+            <span class="path">{{ node.folder }}</span><br>
+            <small>↳ {{ node.file_name }}</small>
           </label>
         </li>
       {% else %}
