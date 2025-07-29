@@ -1,3 +1,27 @@
+{% macro render_tree(tree) %}
+<ul>
+  {% for name, value in tree.items() %}
+    {% if value.get('__leaf__') %}
+      {% set node = value['__leaf__'] %}
+      <li>
+        <label>
+          <input type="checkbox" name="selected" value="{{ node.folder }}">
+          <span class="path">{{ node.folder }}</span><br>
+          <small>↳ {{ node.file_name }}</small>
+        </label>
+      </li>
+    {% else %}
+      <li>
+        <details>
+          <summary>{{ name }}</summary>
+          {{ render_tree(value) }}
+        </details>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% endmacro %}
+
 <!doctype html>
 <html>
 <head>
@@ -14,35 +38,6 @@
 <body>
   <h2>Administrador de carpetas de películas (.strm)</h2>
 
-  
-  {% macro render_tree(tree) %}
-  <ul>
-    {% for name, value in tree.items() %}
-      {% if value.get('__leaf__') %}
-        {% set node = value['__leaf__'] %}
-        <li>
-          <label>
-            <input type="checkbox" name="selected" value="{{ node.folder }}">
-            <span class="path">{{ node.folder }}</span><br>
-            <small>↳ {{ node.file_name }}</small>
-          </label>
-        </li>
-      {% else %}
-        <li>
-          <details>
-            <summary>{{ name }}</summary>
-            {{ render_tree(value) }}
-          </details>
-        </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
-  {% endmacro %}
-
-
-
-
-  
   <form method="POST" action="/move">
     <label><strong>Mover carpetas seleccionadas a:</strong></label>
     <select name="destination" required>
@@ -62,6 +57,7 @@
     <h3>Carpetas con .strm:</h3>
     {{ render_tree(nested_folders) }}
   </form>
+
   <pre>{{ nested_folders|tojson(indent=2) }}</pre>
 </body>
 </html>
