@@ -56,11 +56,15 @@ def get_strm_folders():
     return sorted(strm_folders, key=lambda x: x["folder"])
 
 def get_possible_destinations(strm_folders):
-    """Devuelve un set con los niveles superiores disponibles para mover"""
+    """Devuelve rutas intermedias (sin incluir carpetas con [ID]) como posibles destinos"""
     destinations = set()
 
     for folder in strm_folders:
-        parts = folder.split(os.sep)
+        # Elimina el último segmento (ej: 'Movies/1080p/Nombre [ID]' → 'Movies/1080p')
+        parent_folder = os.path.dirname(folder)
+        parts = parent_folder.split(os.sep)
+
+        # Agrega todos los niveles intermedios: 'Movies', 'Movies/1080p', etc.
         for i in range(1, len(parts) + 1):
             prefix = os.path.join(*parts[:i])
             destinations.add(prefix)
