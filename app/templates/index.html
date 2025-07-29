@@ -1,26 +1,36 @@
 {% macro render_tree(tree) %}
 <ul>
   {% for name, value in tree.items() %}
-    {% if value.get('__leaf__') %}
-      {% set node = value['__leaf__'] %}
-      <li>
+    {% set node = value.get('__leaf__') %}
+    {% set has_children = value|length > (1 if node else 0) %}
+    <li>
+      {% if has_children %}
+        <details>
+          <summary>
+            {% if node %}
+              <label>
+                <input type="checkbox" name="selected" value="{{ node.folder }}">
+                <span class="path">{{ node.folder }}</span><br>
+                <small>↳ {{ node.file_name }}</small>
+              </label>
+            {% else %}
+              {{ name }}
+            {% endif %}
+          </summary>
+          {{ render_tree(value | rejectattr('__leaf__')) }}
+        </details>
+      {% elif node %}
         <label>
           <input type="checkbox" name="selected" value="{{ node.folder }}">
           <span class="path">{{ node.folder }}</span><br>
           <small>↳ {{ node.file_name }}</small>
         </label>
-      </li>
-    {% else %}
-      <li>
-        <details>
-          <summary>{{ name }}</summary>
-          {{ render_tree(value) }}
-        </details>
-      </li>
-    {% endif %}
+      {% endif %}
+    </li>
   {% endfor %}
 </ul>
 {% endmacro %}
+
 
 <!doctype html>
 <html>
