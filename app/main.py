@@ -103,10 +103,11 @@ def nest_strm_folders(strm_folders):
         current = tree
 
         for i, part in enumerate(parts):
-            if i == len(parts) - 1:
+            if i == len(parts) - 1 and item["type"] == "strm":
                 current[part] = {"__leaf__": item}
             else:
                 current = current.setdefault(part, {})
+
 
     return tree
 
