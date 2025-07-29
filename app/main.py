@@ -102,17 +102,15 @@ def nest_strm_folders(strm_folders):
         parts = item["folder"].split(os.sep)
         current = tree
 
-        for part in parts[:-1]:  # carpetas intermedias
-            current = current.setdefault(part, {})
-
-        # Si ya hay un dict (subcarpetas), no lo sobrescribimos
-        leaf_name = parts[-1]
-        if isinstance(current.get(leaf_name), dict):
-            current[leaf_name]["__item__"] = item
-        else:
-            current[leaf_name] = item
+        for i, part in enumerate(parts):
+            if i == len(parts) - 1:
+                # Último nivel (es carpeta con .strm o .library)
+                current[part] = {"__leaf__": item}
+            else:
+                current = current.setdefault(part, {})
 
     return tree
+
 
         
 @app.route('/')
