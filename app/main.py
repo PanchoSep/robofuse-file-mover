@@ -149,10 +149,28 @@ def move():
             print(f"[DEBUG] Existe en JSON: {torrent_id in data}")
             print(f"[DEBUG] Claves actuales: {list(data.keys())}")
             
-            if torrent_id and torrent_id in data:
+            if torrent_id:
                 new_rel = os.path.relpath(dst_path, LIBRARY_DIR)
-                data[torrent_id] = new_rel
-                print(f"✔️ Actualizado {torrent_id} → {new_rel}")
+            
+                # Si el ID no existe aún, inicializa como lista
+                if torrent_id not in data:
+                    data[torrent_id] = [new_rel]
+                    print(f"➕ Agregado {torrent_id} → {new_rel}")
+                else:
+                    # Asegurar que sea lista
+                    if isinstance(data[torrent_id], str):
+                        data[torrent_id] = [data[torrent_id]]
+            
+                    # Remover cualquier ruta vieja que apunta a donde estaba
+                    original_rel = os.path.relpath(src_path, LIBRARY_DIR)
+                    if original_rel in data[torrent_id]:
+                        data[torrent_id].remove(original_rel)
+            
+                    # Agregar la nueva ruta si no está ya
+                    if new_rel not in data[torrent_id]:
+                        data[torrent_id].append(new_rel)
+                        print(f"✔️ Actualizado {torrent_id} → +{new_rel}")
+
 
     save_processed_paths(data)
     return redirect('/')
